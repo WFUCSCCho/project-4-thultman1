@@ -82,20 +82,42 @@ it to this repository.
 
 Insertion, search, and deletion running time (already sorted):
 
-![Firefly picture of a cat 86147](https://github.com/user-attachments/assets/8b2d008e-3011-4979-97b8-fa2e9886a01a)
+![Image](Images/sorted.png)
 
 
 Insertion, search, and deletion running time (shuffled):
 
+![Image](Images/Shuffled.png)
+
 Insertion, search, and deletion running time (reversed):
+
+![Image](Images/Reversed.png)
 
 ## 5. **Document your Dataset and Results**
 Document the source of your dataset and any modifications you made to it. Describe the results of your analysis and 
 how it compares to the theoretical performance of the hash table operations.
 
-Dataset Source: // FINISH ME
-Dataset Modifications ("None" if unchanged): // FINISH ME
-Result Analysis: // FINISH ME
+Dataset Source: https://www.kaggle.com/datasets/gauthamnair2005/imdb-worst-250-movie-dataset
+
+Dataset Modifications ("None" if unchanged): I modified the dataset by copy and pasting the data several times to reach a count of 5500 because the original set just had 250 data points.
+
+Result Analysis: The results across all three input types (sorted, shuffled, and reversed) show that the hash table operations (insert, search, and delete) all scale very slowly as
+N increases, which matches the expected O(1) average-case performance of a separate chaining hash table. Insert times were consistently the highest because insertion may trigger a rehash, while search and delete remained slightly faster and very close to each other, since both mainly involve checking the correct bucket’s linked list.
+
+Input ordering had almost no effect on total runtime. Shuffled and reversed inputs produced nearly identical curves, and even the sorted input only showed minor fluctuation due to normal timing noise from the JVM and system scheduling. Overall, the observed results confirm that the hash table distributes keys evenly and handles collisions efficiently, maintaining near-constant-time performance for all three operations.
+## ChatGPT Interactions:
+### Interaction 1:
+1) Prompt: Could you help me complete the project 4 class? I'm mostly done with it, just need logic and syntax help
+
+Output (partial since long):
+  
+ ![Image](Images/chat1.png)
+
+2) Prompt: Could you please help me finish the separate chaining hash table class? It's mostly done just needs a couple changes
+
+Output (partial since long):
+ 
+  ![Image](Images/chat2.png)
 
 ## Submission:
 

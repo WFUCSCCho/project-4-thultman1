@@ -1,136 +1,151 @@
+/****************************************************
+ * @file: SeparateChainingHashTable.java
+ * @description:
+ *      Implements a generic Separate Chaining Hash Table. Uses an array of LinkedLists to store elements and
+ *      resolves collisions by chaining. Supports core hash table operations including insert, remove,
+ *      search (contains), and rehashing when the load factor exceeds 1.0. Table size is maintained as a
+ *      prime number to reduce clustering.
+ * @acknowledgment: Portions of this code and documentation were developed with assistance from ChatGPT by OpenAI.
+ * @author: Tim Hultman
+ * @date: December 4, 2025
+ ****************************************************/
 import java.util.LinkedList;
 import java.util.List;
-
-// SeparateChaining Hash table class
-//
-// CONSTRUCTION: an approximate initial size or default of 101
-//
-// ******************PUBLIC OPERATIONS*********************
-// void insert( x )       --> Insert x
-// void remove( x )       --> Remove x
-// boolean contains( x )  --> Return true if x is present
-// void makeEmpty( )      --> Remove all items
-
 public class SeparateChainingHashTable<AnyType> {
     /**
-     * Construct the hash table.
+     * Default constructor.
+     * Creates a hash table of default size (101).
      */
     public SeparateChainingHashTable() {
         this(DEFAULT_TABLE_SIZE);
     }
-
     /**
-     * Construct the hash table.
+     * Constructs the hash table with a given initial size.
+     * The actual table size is the next prime number ≥ size.
      *
-     * @param size approximate table size.
+     * @param size approximate initial number of buckets
      */
     public SeparateChainingHashTable(int size) {
         theLists = new LinkedList[nextPrime(size)];
         for (int i = 0; i < theLists.length; i++)
             theLists[i] = new LinkedList<>();
+        currentSize = 0;
     }
 
     /**
-     * Insert into the hash table. If the item is
-     * already present, then do nothing. Rehash if
-     * the insertion exceeds the table size.
+     * Inserts an item into the hash table.
+     * Duplicate elements are ignored.
      *
-     * @param x the item to insert.
+     * If load factor exceeds 1.0, the table rehashes
+     * to double its size (next prime).
+     *
+     * @param x the item to insert
      */
     public void insert(AnyType x) {
-        // FINISH ME
+        List<AnyType> whichList = theLists[myhash(x)];
+
+        if (!whichList.contains(x)) {
+            whichList.add(x);
+
+            // rehash if load factor > 1
+            if (++currentSize > theLists.length)
+                rehash();
+        }
     }
 
     /**
-     * Remove from the hash table.
+     * Removes an item from the hash table if it exists.
      *
-     * @param x the item to remove.
+     * @param x the item to remove
      */
     public void remove(AnyType x) {
-        // FINISH ME
+        List<AnyType> whichList = theLists[myhash(x)];
+
+        if (whichList.contains(x)) {
+            whichList.remove(x);
+            currentSize--;
+        }
     }
 
     /**
-     * Find an item in the hash table.
+     * Determines whether an item exists in the hash table.
      *
-     * @param x the item to search for.
-     * @return true if x is not found.
+     * @param x the item to search for
+     * @return true if found, false otherwise
      */
     public boolean contains(AnyType x) {
-        // FINISH ME
+        List<AnyType> whichList = theLists[myhash(x)];
+        return whichList.contains(x);
     }
 
     /**
-     * Make the hash table logically empty.
+     * Makes the table logically empty by clearing all chains.
+     * Does not resize the table.
      */
     public void makeEmpty() {
-        // FINISH ME
+        for (List<AnyType> list : theLists)
+            list.clear();
+        currentSize = 0;
     }
 
     /**
-     * A hash routine for String objects.
-     *
-     * @param key       the String to hash.
-     * @param tableSize the size of the hash table.
-     * @return the hash value.
+     * Rehashes the table.
+     * Creates a new table of double the size (next prime),
+     * and reinserts all existing elements into the new table.
      */
-    public static int hash(String key, int tableSize) {
-        int hashVal = 0;
-
-        for (int i = 0; i < key.length(); i++)
-            hashVal = 37 * hashVal + key.charAt(i);
-
-        hashVal %= tableSize;
-        if (hashVal < 0)
-            hashVal += tableSize;
-
-        return hashVal;
-    }
-
     private void rehash() {
-        // FINISH ME
-    }
+        List<AnyType>[] oldLists = theLists;
 
+        // create new table of double size
+        theLists = new LinkedList[nextPrime(2 * oldLists.length)];
+        for (int i = 0; i < theLists.length; i++)
+            theLists[i] = new LinkedList<>();
+
+        currentSize = 0;
+
+        // reinsert everything
+        for (List<AnyType> list : oldLists)
+            for (AnyType x : list)
+                insert(x);
+    }
+    /**
+     * Internal hash function.
+     * Computes the hash code and maps it into the table range.
+     *
+     * @param x the key to hash
+     * @return bucket index for the key
+     */
     private int myhash(AnyType x) {
         int hashVal = x.hashCode();
-
         hashVal %= theLists.length;
-        if (hashVal < 0)
-            hashVal += theLists.length;
-
+        if (hashVal < 0) hashVal += theLists.length;
         return hashVal;
     }
 
     private static final int DEFAULT_TABLE_SIZE = 101;
-
-    /**
-     * The array of Lists.
-     */
+    /** Underlying array of chains */
     private List<AnyType>[] theLists;
+    /** Number of items currently stored */
     private int currentSize;
-
     /**
-     * Internal method to find a prime number at least as large as n.
+     * Returns the next prime number ≥ n.
      *
-     * @param n the starting number (must be positive).
-     * @return a prime number larger than or equal to n.
+     * @param n starting value
+     * @return the next prime ≥ n
      */
     private static int nextPrime(int n) {
         if (n % 2 == 0)
             n++;
 
-        for (; !isPrime(n); n += 2)
-            ;
-
+        for (; !isPrime(n); n += 2);
         return n;
     }
-
     /**
-     * Internal method to test if a number is prime.
-     * Not an efficient algorithm.
+     * Tests whether a number is prime.
+     * Used for sizing the hash table.
      *
-     * @param n the number to test.
-     * @return the result of the test.
+     * @param n number to test
+     * @return true if prime
      */
     private static boolean isPrime(int n) {
         if (n == 2 || n == 3)
@@ -145,7 +160,4 @@ public class SeparateChainingHashTable<AnyType> {
 
         return true;
     }
-
 }
-
-
