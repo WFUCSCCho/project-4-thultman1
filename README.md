@@ -111,13 +111,13 @@ Input ordering had almost no effect on total runtime. Shuffled and reversed inpu
 
 Output (partial since long):
   
- ![image](Images/Screenshot 2025-11-24 at 5.20.52 PM.png)
+ ![Image](Images/chat1.png)
 
 2) Prompt: Could you please help me finish the separate chaining hash table class? It's mostly done just needs a couple changes
 
 Output (partial since long):
  
-  ![image](Images/Screenshot 2025-11-24 at 5.25.00 PM.png)
+  ![Image](Images/chat2.png)
 
 ## Submission:
 
